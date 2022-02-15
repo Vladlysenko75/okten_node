@@ -63,5 +63,53 @@ const fs = require("fs");
 // 3. Створіть папку (можете вручну) напишіть скріпт який створить в ній якись дані (можуть бути нові папки і файли(в файли запишіть якусь дату) )
 // і напишіть функцію яка буде зчитувати папку і перевіряти якщо дані які в ній лежать - це файли тоді вам потрібно їх очистити, але не видаляти, якщо дані - це папки, вам потрібно їх перейменувати і додати до назви префікс _new
 
+// fs.mkdir(path.join(__dirname, 'sebastian', 'viktor', 'volodymyr'),{recursive: true}, (err => {
+//     if (err) {
+//         console.log(err)
+//         throw err;
+//     }
+//     fs.writeFile(path.join(__dirname, 'sebastian', 'viktor', 'volodymyr', 'volodya.txt'), 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illo, repellendus.', (err => {
+//         if (err) {
+//             console.log(err)
+//             throw err;
+//         }
+//         fs.writeFile(path.join(__dirname, 'sebastian', 'viktor', 'vitia.txt'), 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illo, repellendus.', (err => {
+//             if (err) {
+//                 console.log(err)
+//                 throw err;
+//             }
+//         }))
+//     }))
+// }))
 
+const searchWay = path.join(__dirname, 'sebastian', 'viktor');
+
+
+function contentChecker(pathWay) {
+    fs.readdir(pathWay, ((err, files) => {
+        if (err) {
+            console.log(err)
+            throw err;
+        }
+        files.forEach(file => {
+            if (path.extname(file)) {
+                fs.truncate(path.join(pathWay, file), err => {
+                    if (err) {
+                        console.log(err)
+                        throw err;
+                    }
+                })
+            } else {
+                fs.rename(path.join(pathWay, file), path.join(pathWay, `_new${file}`), (err => {
+                    if (err) {
+                        console.log(err)
+                        throw err;
+                    }
+                }))
+            }
+        })
+    }))
+}
+
+contentChecker(searchWay)
 
