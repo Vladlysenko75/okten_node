@@ -84,7 +84,6 @@ const fs = require("fs");
 
 const searchWay = path.join(__dirname, 'sebastian', 'viktor');
 
-
 function contentChecker(pathWay) {
     fs.readdir(pathWay, ((err, files) => {
         if (err) {
