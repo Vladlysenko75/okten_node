@@ -18,6 +18,7 @@
 const express = require('express');
 const {engine} = require('express-handlebars');
 const path = require('path');
+const apiRoutes = require('./routes/apiRoutes');
 
 const app = express();
 app.use(express.json());
@@ -28,80 +29,7 @@ app.set('view engine', '.hbs');
 app.engine('.hbs', engine({defaultLayout: false}));
 app.set('views', path.join(__dirname, 'static'));
 
-let users = [];
-
-app.get('/login', ((req, res) => {
-    res.render('login')
-}))
-
-app.get('/users', ((req, res) => {
-    if (Object.keys(req.query).length) {
-        let usersArray = [...users];
-        if (req.query.age) {
-            usersArray = usersArray.filter(user => user.age === req.query.age);
-        }
-        if (req.query.city) {
-            usersArray = usersArray.filter(user => user.city === req.query.city);
-        }
-        res.render('users', {users: usersArray})
-        return;
-    }
-    res.render('users', {users})
-}))
-
-app.get('/error', ((req, res) => {
-    res.render('error')
-}))
-
-app.get('/signError', ((req, res) => {
-    res.render('signError')
-}))
-
-app.get('/signIn', ((req, res) => {
-    res.render('signIn')
-}))
-
-app.get('/users/:userId', ((req, res) => {
-    const {userId} = req.params;
-    const oneUser = users.find(user => user.id === userId)
-    res.render('oneUser', {oneUser})
-}))
-
-app.post('/login', ((req, res) => {
-    if (users.find(user => user.email === req.body.email)) {
-        const loginError = 'Account under this email already existed! Choose another email!'
-        return res.render('error', {error: loginError, path: '/login', linkTitle: 'Register'})
-    }
-    users.push({...req.body, id: String(new Date().getTime())})
-    return res.redirect('/users')
-
-}))
-
-app.post('/signIn', ((req, res) => {
-    function loginValidator(email, password) {
-        const signedUser = users.find(user => user.email === email)
-        const signError = 'Email or password is incorrect';
-        if (!signedUser) {
-            return res.render('error', {error: signError, linkTitle: 'Try sign in again', path: '/signIn'})
-        }
-        if (signedUser.password !== password) {
-            return res.render('error', {error: signError, linkTitle: 'Try sign in again', path: '/signIn'})
-        }
-        return res.redirect(`/users/${signedUser.id}`)
-    }
-
-    loginValidator(req.body.email, req.body.password)
-}))
-
-app.post('/users/:userId', ((req, res) => {
-    const {userId} = req.params;
-    users = users.filter(user => user.id !== userId)
-    res.redirect('/users')
-}))
-
-app.use((req, res) => {
-    res.render('notFound')
-})
+app.use(apiRoutes);
 
 app.listen(5400, () => {
     console.log('Server is active on PORT 5400')
