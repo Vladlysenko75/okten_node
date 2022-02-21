@@ -69,24 +69,27 @@ app.get('/users/:userId', ((req, res) => {
 
 app.post('/login', ((req, res) => {
     if (users.find(user => user.email === req.body.email)) {
-        res.redirect('/error')
-    } else {
-        users.push({...req.body, id: String(new Date().getTime())})
-        res.redirect('/users')
+        const loginError = 'Account under this email already existed! Choose another email!'
+        return res.render('error', {error: loginError, path: '/login', linkTitle: 'Register'})
     }
+    users.push({...req.body, id: String(new Date().getTime())})
+    return res.redirect('/users')
+
 }))
 
 app.post('/signIn', ((req, res) => {
     function loginValidator(email, password) {
         const signedUser = users.find(user => user.email === email)
+        const signError = 'Email or password is incorrect';
         if (!signedUser) {
-            res.redirect('/signError')
+            return res.render('error', {error: signError, linkTitle: 'Try sign in again', path: '/signIn'})
         }
         if (signedUser.password !== password) {
-            res.redirect('/signError')
+            return res.render('error', {error: signError, linkTitle: 'Try sign in again', path: '/signIn'})
         }
         return res.redirect(`/users/${signedUser.id}`)
     }
+
     loginValidator(req.body.email, req.body.password)
 }))
 
