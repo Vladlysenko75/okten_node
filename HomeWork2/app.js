@@ -77,16 +77,17 @@ app.post('/login', ((req, res) => {
 }))
 
 app.post('/signIn', ((req, res) => {
-    const signedUser = users.find(user => user.email === req.body.email);
-    if (signedUser) {
-        if (signedUser.password === req.body.password) {
-            res.redirect(`/users/${signedUser.id}`)
-        } else {
+    function loginValidator(email, password) {
+        const signedUser = users.find(user => user.email === email)
+        if (!signedUser) {
             res.redirect('/signError')
         }
-    } else {
-        res.redirect('/signError')
+        if (signedUser.password !== password) {
+            res.redirect('/signError')
+        }
+        return res.redirect(`/users/${signedUser.id}`)
     }
+    loginValidator(req.body.email, req.body.password)
 }))
 
 app.post('/users/:userId', ((req, res) => {
